@@ -17,6 +17,9 @@ import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.details.ServiceCacheListener;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -121,7 +124,7 @@ public class ZookeeperClusterDiscovery extends AbstractClusterDiscovery {
                 Cluster cluster = clusterFromInstances(cache.getInstances());
 
                 for (ServiceInstance<?> instance : cache.getInstances()) {
-                    cluster.getServers().add(convertInstance(instance));
+                    if (isReachable(instance)) cluster.getServers().add(convertInstance(instance));
                 }
 
                 log.info("Discovery: cluster=[{}] has {} instances, {}...",
@@ -149,6 +152,36 @@ public class ZookeeperClusterDiscovery extends AbstractClusterDiscovery {
             .servers(servers.build())
             .build();
     }
+
+    protected boolean isReachable(ServiceInstance<?> t) {
+        Integer port = t.getSslPort() != null ? t.getSslPort() : t.getPort();
+        String host = t.getAddress();
+        Socket socket = null;
+        boolean reachable = false;
+
+        if ((port < 0) || (port > 65535)) {
+            log.warn(String.format("Invalid port for %s:%s! Skipping..", host, port));
+            reachable = false;
+        }
+
+        try {
+            socket = new Socket(host, port);
+            reachable = true;
+        } catch (UnknownHostException e) {
+            log.warn(String.format("%s:%s unreachable! Skipping..", host, port));
+        } catch (IOException e) {
+            log.warn(String.format("%s:%s unreachable! Skipping..", host, port));
+        }
+        finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch(Exception e) { }
+            }
+        }
+        return reachable;
+    }
+
 
     protected Server convertInstance(ServiceInstance<?> instance) {
         Integer port = instance.getSslPort() != null ? instance.getSslPort() : instance.getPort();

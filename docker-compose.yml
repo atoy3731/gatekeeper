@@ -1,0 +1,127 @@
+version: '2'
+
+# Salt Master Relevant Environment Variables:
+#    BRANCH - Branch of the 'salt' project to use. (Default: master)
+#    RUN_SALT - Whether to run the salt command upon start-up. (Default: true)
+#    SALT_CMD - Salt command to be executed upon start-up (Default: salt '*' state.apply saltenv=base)
+
+services:
+  salt:
+    image: docker.363-283.io/docker/salt-test-environment:salt-master-1.0
+    hostname: salt
+    container_name: salt-master
+    environment:
+      - BRANCH=feature/aac-1.1
+      - RUN_SALT=true
+      - SALT_CMD=echo "salt service* state.apply services/aac_1_1 saltenv=base"
+
+  service01:
+    image: docker.363-283.io/docker/backend:salt-minion-1.0
+    hostname: service01
+    container_name: service01
+    extra_hosts:
+      - "mongodb01 mongodb01.maindev.dctc.local:10.2.11.17"
+      - "mongodb02 mongodb02.maindev.dctc.local:10.2.11.18"
+      - "mongodb03 mongodb03.maindev.dctc.local:10.2.11.35"
+      - "redis01 redis01.maindev.dctc.local:10.2.11.15"
+      - "redis02 redis02.maindev.dctc.local:10.2.11.16"
+      - "redis03 redis03.maindev.dctc.local:10.2.11.17"
+      - "kafka01 kafka01.maindev.dctc.local:10.2.11.8"
+      - "kafka02 kafka02.maindev.dctc.local:10.2.11.7"
+      - "kafka03 kafka03.maindev.dctc.local:10.2.11.10"
+      - "es01 es01.maindev.dctc.local:10.2.11.210"
+      - "es02 es02.maindev.dctc.local:10.2.11.243"
+      - "es03 es03.maindev.dctc.local:10.2.11.19"
+
+  consumers01:
+    image: docker.363-283.io/docker/salt-test-environment:salt-minion-1.0
+    hostname: consumers01
+    container_name: consumers01
+    extra_hosts:
+      - "mongodb01 mongodb01.maindev.dctc.local:10.2.11.17"
+      - "mongodb02 mongodb02.maindev.dctc.local:10.2.11.18"
+      - "mongodb03 mongodb03.maindev.dctc.local:10.2.11.35"
+      - "redis01 redis01.maindev.dctc.local:10.2.11.15"
+      - "redis02 redis02.maindev.dctc.local:10.2.11.16"
+      - "redis03 redis03.maindev.dctc.local:10.2.11.17"
+      - "kafka01 kafka01.maindev.dctc.local:10.2.11.8"
+      - "kafka02 kafka02.maindev.dctc.local:10.2.11.7"
+      - "kafka03 kafka03.maindev.dctc.local:10.2.11.10"
+      - "es01 es01.maindev.dctc.local:10.2.11.210"
+      - "es02 es02.maindev.dctc.local:10.2.11.243"
+      - "es03 es03.maindev.dctc.local:10.2.11.19"
+
+
+  nginx01:
+    image: docker.363-283.io/docker/backend:salt-minion-1.0
+    hostname: nginx01
+    container_name: nginx01
+    ports:
+      - "8443:443"
+      - "8080:80"
+    extra_hosts:
+      - "mongodb01 mongodb01.maindev.dctc.local:10.2.11.17"
+      - "mongodb02 mongodb02.maindev.dctc.local:10.2.11.18"
+      - "mongodb03 mongodb03.maindev.dctc.local:10.2.11.35"
+      - "redis01 redis01.maindev.dctc.local:10.2.11.15"
+      - "redis02 redis02.maindev.dctc.local:10.2.11.16"
+      - "redis03 redis03.maindev.dctc.local:10.2.11.17"
+      - "kafka01 kafka01.maindev.dctc.local:10.2.11.8"
+      - "kafka02 kafka02.maindev.dctc.local:10.2.11.7"
+      - "kafka03 kafka03.maindev.dctc.local:10.2.11.10"
+      - "es01 es01.maindev.dctc.local:10.2.11.210"
+      - "es02 es02.maindev.dctc.local:10.2.11.243"
+      - "es03 es03.maindev.dctc.local:10.2.11.19"
+
+  jobs01:
+    image: docker.363-283.io/docker/backend:salt-minion-1.0
+    hostname: jobs01
+    container_name: jobs01
+    extra_hosts:
+      - "mongodb01 mongodb01.maindev.dctc.local:10.2.11.17"
+      - "mongodb02 mongodb02.maindev.dctc.local:10.2.11.18"
+      - "mongodb03 mongodb03.maindev.dctc.local:10.2.11.35"
+      - "redis01 redis01.maindev.dctc.local:10.2.11.15"
+      - "redis02 redis02.maindev.dctc.local:10.2.11.16"
+      - "redis03 redis03.maindev.dctc.local:10.2.11.17"
+      - "kafka01 kafka01.maindev.dctc.local:10.2.11.8"
+      - "kafka02 kafka02.maindev.dctc.local:10.2.11.7"
+      - "kafka03 kafka03.maindev.dctc.local:10.2.11.10"
+      - "es01 es01.maindev.dctc.local:10.2.11.210"
+      - "es02 es02.maindev.dctc.local:10.2.11.243"
+      - "es03 es03.maindev.dctc.local:10.2.11.19"
+
+  python01:
+    image: docker.363-283.io/docker/backend:salt-minion-1.0
+    hostname: python01
+    container_name: python01
+    extra_hosts:
+      - "mongodb01 mongodb01.maindev.dctc.local:10.2.11.17"
+      - "mongodb02 mongodb02.maindev.dctc.local:10.2.11.18"
+      - "mongodb03 mongodb03.maindev.dctc.local:10.2.11.35"
+      - "redis01 redis01.maindev.dctc.local:10.2.11.15"
+      - "redis02 redis02.maindev.dctc.local:10.2.11.16"
+      - "redis03 redis03.maindev.dctc.local:10.2.11.17"
+      - "kafka01 kafka01.maindev.dctc.local:10.2.11.8"
+      - "kafka02 kafka02.maindev.dctc.local:10.2.11.7"
+      - "kafka03 kafka03.maindev.dctc.local:10.2.11.10"
+      - "es01 es01.maindev.dctc.local:10.2.11.210"
+      - "es02 es02.maindev.dctc.local:10.2.11.243"
+      - "es03 es03.maindev.dctc.local:10.2.11.19"
+
+  redis01:
+    image: docker.363-283.io/docker/backend:salt-minion-1.0
+    hostname: redis01
+    container_name: redis01
+
+  redis02:
+    image: docker.363-283.io/docker/backend:salt-minion-1.0
+    hostname: redis02
+    container_name: redis02
+
+  zookeeper:
+    image: docker.363-283.io/docker/backend:zookeeper-3.4.6
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
